@@ -15,6 +15,7 @@ export {
   useEffect,
   useMemo,
   useImperativeHandle,
+  useAccessibility,
   usePromise,
   useAction,
   useRect,

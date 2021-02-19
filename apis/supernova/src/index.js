@@ -21,6 +21,7 @@ export {
   useAppLayout,
   useTranslator,
   useConstraints,
+  useAccessibility,
   useOptions,
   onTakeSnapshot,
 } from './hooks';

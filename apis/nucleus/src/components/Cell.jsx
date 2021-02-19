@@ -254,13 +254,14 @@ const getType = async ({ types, name, version }) => {
   return SN;
 };
 
-const loadType = async ({ dispatch, types, visualization, version, model, app, selections }) => {
+const loadType = async ({ dispatch, types, visualization, version, model, app, selections, accessibility }) => {
   try {
     const snType = await getType({ types, name: visualization, version });
     const sn = snType.create({
       model,
       app,
       selections,
+      accessibility,
     });
     return sn;
   } catch (err) {
@@ -270,9 +271,9 @@ const loadType = async ({ dispatch, types, visualization, version, model, app, s
 };
 
 const Cell = forwardRef(({ halo, model, initialSnOptions, initialError, onMount }, ref) => {
-  const { app, types } = halo;
+  const { app, types, root } = halo;
 
-  const { translator, language } = useContext(InstanceContext);
+  const { translator, language, accessibility } = useContext(InstanceContext);
   const theme = useTheme();
   const [cellRef, cellRect, cellNode] = useRect();
   const [state, dispatch] = useReducer(contentReducer, initialState(initialError));
@@ -304,6 +305,29 @@ const Cell = forwardRef(({ halo, model, initialSnOptions, initialError, onMount 
       hoveringDebouncer.current.leave = null;
     }, 750);
   };
+  const handleKeyDown = (e) => {
+    console.log(e);
+    if ([13, 32].includes(e.keyCode)) {
+      // Enter or space
+      // Cell can set to halo which component is on focus, but can HALO somewhere propagate this to all others?
+      /*        let c = { ...halo.context };
+        c.accessibility = {focus: false};
+        root.context(c)*/
+
+      const acc =
+        state.sn && state.sn.component && state.sn.component.__hooks && state.sn.component.__hooks.accessibility;
+      if (acc && acc.setter) {
+        acc.setter({ focus: true });
+      }
+
+      // This works, but isn't good
+      //state.sn.component.render({ context: {accessibility: { focus: true }}});
+      // acc.setter({ focus: true });
+    }
+    if (e.keyCode == 82 /* r */) {
+      state.sn.component.render();
+    }
+  };
 
   useEffect(() => {
     if (initialError || !appLayout || !layout) {
@@ -328,6 +352,7 @@ const Cell = forwardRef(({ halo, model, initialSnOptions, initialError, onMount 
         model,
         app,
         selections,
+        accessibility,
       });
       if (sn) {
         dispatch({ type: 'LOADED', sn, visualization });
@@ -432,12 +457,14 @@ const Cell = forwardRef(({ halo, model, initialSnOptions, initialError, onMount 
   return (
     <Paper
       style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
+      tabIndex={0}
       elevation={0}
       square
       className={CellElement.className}
       ref={cellRef}
       onMouseEnter={handleOnMouseEnter}
       onMouseLeave={handleOnMouseLeave}
+      onKeyDown={handleKeyDown}
     >
       <Grid
         container

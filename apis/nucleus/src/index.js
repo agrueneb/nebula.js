@@ -24,6 +24,7 @@ const DEFAULT_CONTEXT = /** @lends Context */ {
   /** @type {string=} */
   language: 'en-US',
   constraints: {},
+  accessibility: { focus: false },
 };
 
 /**

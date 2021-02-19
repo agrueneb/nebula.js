@@ -45,6 +45,9 @@ export function initiate(component, { explicitResize = false } = {}) {
       setters: [],
       explicitResize,
     },
+    accessibility: {
+      setter: null,
+    },
   };
 }
 
@@ -58,6 +61,7 @@ export function teardown(component) {
   component.__hooks.actions = null;
   component.__hooks.imperativeHandle = null;
   component.__hooks.resizer = null;
+  component.__hooks.accessibility = null;
 
   component.__actionsDispatch = null;
 
@@ -923,4 +927,17 @@ export function onTakeSnapshot(cb) {
     currentComponent.__hooks.snaps.push(h);
   }
   h.fn = cb;
+}
+
+export function useAccessibility() {
+  const accessibility = useInternalContext('accessibility');
+  const [acc, setAcc] = useState(accessibility);
+
+  currentComponent.__hooks.accessibility.setter = setAcc;
+  /* useEffect(() => {
+    console.log('acc hook: ' + accessibility.focus);
+    setAcc(accessibility);
+  }, [accessibility]);*/
+
+  return acc;
 }

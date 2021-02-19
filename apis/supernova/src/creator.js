@@ -49,7 +49,7 @@ function createWithHooks(generator, opts, galaxy) {
   // use a deep comparison for 'small' objects
   let hasRun = false;
   const current = {};
-  const deepCheck = ['appLayout', 'constraints'];
+  const deepCheck = ['appLayout', 'constraints', 'accessibility'];
   const forcedConstraints = {};
 
   // select should be a constraint when a real model is not available
@@ -66,6 +66,7 @@ function createWithHooks(generator, opts, galaxy) {
       app: opts.app,
       global: qGlobal,
       selections: opts.selections,
+      accessibility: opts.accessibility,
       element: undefined, // set on mount
       // ---- singletons ----
       theme: undefined,
@@ -95,6 +96,11 @@ function createWithHooks(generator, opts, galaxy) {
         if (r.context && r.context.theme) {
           // changed is set further down only if the name is different
           this.context.theme = r.context.theme;
+        }
+
+        if (r.context && r.context.accessibility) {
+          // changed is set further down only if the name is different
+          this.context.accessibility = r.context.accessibility;
         }
 
         if (r.options) {
